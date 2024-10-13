@@ -1,0 +1,316 @@
+---
+title: "PROJECT 1"
+author: "Svetlana Voda"
+date: "10/11/2022"
+output:
+  html_document:
+    df_print: paged
+  word_document: default
+---
+
+
+
+
+```{r, echo=FALSE}
+setwd("C:/Users/vital/Desktop/UNIVERISTY/STAT 382/PROJECT/PROJECT1")
+
+apps_data <- read.csv("apps_data.csv", header = TRUE)
+
+TI_Fivenum <- function(dataset){
+  x <- sort(dataset)
+  n <- length(x)
+  if(n %% 2 == 1){Q <- fivenum(x[-(n+1)/2])[c(2,4)]}
+  if(n %% 2 == 0){Q <- fivenum(x)[c(2,4)]}
+  minimum <- min(x)
+  med <- median(x)
+  maximum <- max(x)
+  result <- as.data.frame(list(min = minimum, Q1 = Q[1], median = med, Q3 = Q[2], max = maximum))
+  return(result)
+}
+
+
+```
+
+
+
+
+## TASK1  
+
+
+Histogram and Boxplot of Rating   
+
+```{r, echo=FALSE}
+par(mfrow = c(1,2))
+hist(apps_data$Rating, right = FALSE, main = "Histogram of Rating", col = "blue" )
+boxplot(apps_data$Rating, main= "Boxplot of Rating", col = "red", horizontal = TRUE)
+par(mfrow = c(1,1))
+```
+
+
+
+Analyzing histogram and boxplot of quantitative variable Rating we can describe our data as symmetric (bell-shaped) with one peak and two outliers, where we can conclude that data is Normal distributed.The center of the data is represented by equal mean, median, and mode.The median and mean are  equal 4.3 . The standard deviation of variable Rating is `r sd(apps_data$Rating)`.The range of the data is `r range(apps_data$Rating)`, and the difference between range is `r diff(range(apps_data$Rating))`. The IQR is 0.2  
+
+
+```{r, echo=FALSE}
+summary(apps_data$Rating)  
+```
+
+
+
+Histogram and Boxplot of Reviews   
+
+```{r, echo =FALSE}
+par(mfrow = c(1,2))
+hist(apps_data$Reviews, right = FALSE, main = "Histogram of Reviews", col = "yellow" )
+boxplot(apps_data$Reviews, main= "Boxplot of Reviews", col = "orange")
+par(mfrow = c(1,1))
+
+```
+
+
+Analyzing histogram and boxplot of quantitative variable Reviews we can describe as Right-Skewed with 3 outliers. The value for the center of the data is median. So, we can conclude that data is not Normal distributed. From out descriptive statistic we can see  that the median  is 7306.5 and mean is `r mean(apps_data$Reviews, na.rm = TRUE)`. The standard deviation of variable Reviews is `r sd(apps_data$Reviews)`. The range of the data is 4 and 8118609 with difference between range `r diff(range(apps_data$Reviews))`. The IQR is 82895.5 . 
+
+```{r, echo=FALSE}
+TI_Fivenum(apps_data$Reviews)  
+
+```
+
+
+
+
+## TASK2  
+
+Barplot of Category and Content Rating
+
+```{r, echo=FALSE}
+apps_data$Category <- factor(apps_data$Category, ordered = TRUE, levels = c("GAME", "FAMILY", "TOOLS"))
+
+apps_data$Content.Rating <- factor(apps_data$Content.Rating, ordered = TRUE, levels = c("Everyone","Everyone 10+", "Teen", "Mature 17+"))
+
+table_category <-table(apps_data$Category)
+table_content.rating <- table(apps_data$Content.Rating)
+
+
+par(mfrow = c(1,2))
+barplot(table_category, xlab= "Category of apps", ylab= "Frequency", col = c("red", "blue","darkgreen"), main = "Category Data")
+barplot(table_content.rating, xlab= "Category of population", ylab= "Frequency", col = c("orchid", "cyan3","yellowgreen", "royalblue3"), main = "Content Rating") 
+par(mfrow = c(1,1)) 
+
+
+```
+
+```
+GAME  | FAMILY | TOOLS 
+----- |------- |------ 
+41    | 88     | 35    
+```
+
+
+
+```{r, echo=FALSE}
+TI_Fivenum(table_category)
+```
+
+
+
+Analyzing bar plot of app Category we compares the frequency of different category  of apps. Family category are the most popular types of apps, followed by Game, and Tools. The frequency range from about 35 to 88. The median its come to Game department.  Least popular is Tool category.
+
+
+
+```
+Everyone  | Everyone 10+ | Teen  | Mature 17+   
+--------- |------------- |------ |----------- 
+  118     | 10           | 28    | 8          
+
+```
+```{r, echo=FALSE}
+TI_Fivenum(table_content.rating)
+```
+
+
+Analyzing bar plot of age Category the most common group of age using Google Play Store is Everyone followed by Teen,Everyone 10+,  and  Mature 17+. The frequency range from about 8 to 118. The median statistic is between Everyone 10+ and Teen.
+
+
+
+## TASK3
+
+Boxplot of Rating and Reviews Category
+
+```{r, echo=FALSE}
+par(mfrow = c(1,2))
+boxplot(apps_data$Rating~apps_data$Category, col = c("red", "yellow","blue"))
+boxplot(apps_data$Reviews~apps_data$Category, col = c("orange", "pink","cyan3"))
+par(mfrow = c(1,1))
+```
+
+Analyzing and comparing Boxplot of Rating and  Reviews  by Category( Game, Family and Tools) we can see that the medians on Rating is equal 4.300, the range is almost the same. Outlier is present only in Family category. In contrast to Rating, in Reviews Category we see huge discrepancy between median, mean , and presents of multiple outlier. So we can conclude that  this Category are vary from each other.  
+
+
+
+Table of Rating  
+
+```{r, echo=FALSE}
+tapply(apps_data$Rating, apps_data$Category, summary)
+```
+
+Table of Review
+
+```{r, echo=FALSE}
+tapply(apps_data$Reviews, apps_data$Category, summary)
+```
+
+
+ 
+
+
+
+
+## TASK4
+
+Barplot of Content.Rating by Category
+
+```{r, echo=FALSE}
+table_conrating_by_category1 <-table(apps_data$Content.Rating, apps_data$Category)
+
+
+barplot(table_conrating_by_category1,ylab= "Frequency",xlab="Category", main = "Barplot of Content Rating (Row) by Category (Column)", col = c("mediumorchid1","cornflowerblue", "seagreen1","orange"), legend.text = TRUE)
+
+```
+
+Looking at our stacked bar chart, we clearly see, for example, that Tools Category is the least choosing , and this is mainly because the age groups such as Teen, Mature 17+ , and Everyone where not interested on this Category. In contrast the stacked bar chart category Family for group Everyone is the most effective, has the most number of apps. On Category Game the most popular is for group Teen followed by Everyone.
+
+
+```
+              | FAMILY  | GAME   | TOOLS    
+------------- |-------- |------- |-------  
+Everyone      | 69      | 14     | 35  
+Everyone 10+  | 6       | 4      | 0  
+Mature 17+    | 2       | 6      | 0   
+Teen          | 11      | 17     | 0  
+
+```
+
+
+
+## TASK5
+
+Histogram and Q-Q Plot of App-Size.
+```{r, echo=FALSE}
+skew <-function(x) {
+  m3 <- sum((x-mean(x)) ^ 3) / length(x)
+  m3/(sd(x)^3)
+}
+kurt <-function(x) {
+  m4 <- sum( (x-mean(x))^4 )/ length(x)
+  m4/ (sd(x) ^ 4)
+}
+
+
+```
+
+```{r, echo=FALSE}
+par(mfrow = c(1,2))
+hist(apps_data$App_Size, right = FALSE, col= "magenta", main = "Histogram of App_Size")
+qqnorm(apps_data$App_Size)
+qqline(apps_data$App_Size)
+par(mfrow = c(1,1))
+
+```
+
+From our graphs, we can conclude that our data is not normal distributed, because histogram look Right-Skewer. There are issues with Q-Q Plot, it does not follow reference line very well.There are issues on the bottom left and top right. The skew is `r skew(apps_data$App_Size)` and is far from zero. It's not symmetric. The Kurtosis is `r kurt(apps_data$App_Size) `  and is far from 3 which mean the data is not normal.   
+
+```{r, echo=FALSE}
+shapiro.test(apps_data$App_Size)
+```
+Also, from Shapiro-Wilk Test we can see that the p_value is very small and we can conclude that Normality does not seem reasonable.
+
+
+
+Histogram and Q-Q Plot of App-Size.
+```{r, echo=FALSE}
+par(mfrow = c(1,2))
+hist(apps_data$Rating, right = FALSE, col= "cyan3", main = "Histogram of Rating")
+qqnorm(apps_data$Rating)
+qqline(apps_data$Rating)
+par(mfrow = c(1,1))
+```
+
+
+From our graphs, we can conclude that our data could potentially come from a normal distribution, because histogram is somewhat symmetric. The Q-Q Plot look ok but some potential issues at the bottom and on the top. 
+The skew is `r skew(apps_data$Rating)` and is far from zero. The Kurtosis is `r kurt(apps_data$Rating) ` and  is far from 3 which mean the data is not normal. 
+
+```{r, echo=FALSE}
+shapiro.test(apps_data$Rating)
+```
+Also, from Shapiro-Wilk Test we can see that the p_value is very small and we can conclude that Normality does not seem reasonable.
+
+
+## TASK6
+
+Barplot of Genre of apps.
+
+```{r, echo=FALSE}
+game_data <- apps_data[apps_data$Category == 'GAME', ]
+
+game_data$Genre <- factor(game_data$Genre )
+table_game<-table(game_data$Genre)
+
+```
+
+```{r, echo=FALSE}
+barplot(table_game, xlab= "Category of Game", ylab= "Frequency", col = c("maroon", "orange","mediumpurple", "seagreen1"), main = "Barplot of Category  of Games", legend.text = TRUE)
+```
+
+```
+  Action and Adventure | Arcade       | Board and Card  | Mature 17+   
+-----------------------|------------- |-----------------|----------- 
+  22                   | 11           | 6               | 2           
+  
+```
+
+
+
+
+From  the graph the genre of Game Category  we can see that "Action and Adventure"  there are most popular types of Game App in Google Play Store with frequency of 22. Followed by "Arcade and Board" with frequency 11, and "Card". The least popular is "Puzzle" with frequency of 2.
+
+
+
+
+
+
+## TASK7
+
+Barplot of Size_Tier by Genre Apps
+
+```{r, echo=FALSE}
+game_data$Size_Tier[game_data$App_Size < 27 ] <-"Small"
+game_data$Size_Tier[game_data$App_Size >= 27 & game_data$App_Size < 63] <-"Moderate"
+game_data$Size_Tier[game_data$App_Size >=63 ] <-"Large"
+game_data$Size_Tier <-factor(game_data$Size_Tier, ordered = TRUE, levels = c("Small","Moderate","Large"))
+table_size2 <-table(game_data$Size_Tier, game_data$Genre)
+
+```
+
+
+
+```{r, echo=FALSE}
+barplot(table_size2,ylab= "Frequency of Size of Tier",xlab= "Category of Game", col = c("yellow", "springgreen3","orchid3"), beside = TRUE, legend.text = TRUE)
+```
+
+
+
+```
+              | Action and Adventure | Arcade   | Board and Card |  Puzzle 
+------------- |--------------------- |--------- |--------------- |---------
+Small         | 5                    | 4        | 1              |  0
+Moderate      | 12                   | 4        | 3              |  1  
+Large         | 5                    | 3        | 2              |  1   
+
+```
+
+
+
+
+By Analyzing this bar plot we can conclude that Size_Tier varies by genre because  on genre "Action and Adventure"  the most efficient is frequency "Moderate" where the "Small" and "Large"   are the same level. On "Arcade" genre the frequency "Small" and "Moderate" are the same but "Large" is smaller which differ extremely by genre Action and Adventure. While on "Puzzle" genre the frequency "Small" does not exist. 
+
+
